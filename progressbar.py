@@ -80,3 +80,43 @@ with Progress() as progress:
     print("Branches:")
     for branch in branches:
         print(branch)
+        
+        
+import subprocess
+from rich.progress import Progress
+
+# Replace this with the HTTPS URL of your Git repository
+repo_url = "https://github.com/user/repo.git"
+
+def fetch_branches(repo_url):
+    # Use subprocess.check_output to run git ls-remote command and get branch data
+    result = subprocess.check_output(['git', 'ls-remote', '--heads', repo_url], text=True)
+    return result.splitlines()
+
+# Use rich to create and manage a progress bar
+with Progress() as progress:
+    # Start the progress task
+    task = progress.add_task("[cyan]Fetching branches...", total=100)
+
+    # Fetch branch data
+    branches_data = fetch_branches(repo_url)
+
+    # Calculate the increment for each branch processed
+    increment = 100 / len(branches_data) if branches_data else 100
+
+    # Parse the output to extract branch names
+    branches = []
+    for line in branches_data:
+        parts = line.split('\t')
+        branch_name = parts[1].replace('refs/heads/', '')
+        branches.append(branch_name)
+        # Update the progress bar by increment for each branch processed
+        progress.update(task, advance=increment)
+
+    # Complete the task in the progress bar
+    progress.update(task, completed=100)
+
+    # Print the list of branches
+    print("Branches:")
+    for branch in branches:
+        print(branch)
