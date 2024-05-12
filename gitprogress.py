@@ -40,3 +40,47 @@ def fetch_file(repository_url, file_path):
 
 if __name__ == '__main__':
     fetch_file()
+    
+##################
+import os
+from git import Repo
+from git import RemoteProgress
+from rich.progress import Progress
+
+class CloneProgress(RemoteProgress):
+    def __init__(self, progress):
+        super().__init__()
+        self.progress = progress
+        self.task_id = self.progress.add_task("[cyan]Cloning...", total=100)
+
+    def update(self, op_code, cur_count, max_count=None, message=''):
+        if max_count:
+            self.progress.update(self.task_id, advance=(cur_count / max_count * 100))
+
+def fetch_file(repository_url, file_path):
+    local_path = "/tmp/repo"
+    
+    # Clean up the local directory if it exists
+    if os.path.exists(local_path):
+        import shutil
+        shutil.rmtree(local_path)
+
+    # Using Rich's Progress context manager to handle the progress display
+    with Progress() as progress:
+        git_progress = CloneProgress(progress)
+        repo = Repo.clone_from(repository_url, local_path, progress=git_progress)
+
+    # Try to read the file from the cloned repository
+    try:
+        with open(os.path.join(local_path, file_path), 'r') as file:
+            content = file.read()
+            print(f"\nContents of {file_path}:")
+            print(content)
+    except FileNotFoundError:
+        print(f"File {file_path} not found in the repository.")
+
+# Example usage:
+if __name__ == '__main__':
+    repository_url = input("Enter the repository URL: ")
+    file_path = input("Enter the file path within the repository: ")
+    fetch_file(repository_url, file_path)
