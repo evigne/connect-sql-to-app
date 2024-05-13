@@ -65,3 +65,22 @@ if is_aws_cli_installed():
         print("AWS CLI is not connected to an AWS account.")
 else:
     print("AWS CLI is not installed.")
+    
+    
+#edit docker
+def replace_placeholder_in_dockerfile(file_path, new_username):
+    # Read the contents of the Dockerfile
+    with open(file_path, 'r') as file:
+        content = file.read()
+
+    # Replace the placeholder with the new username
+    content = content.replace('${username}', new_username)
+
+    # Write the updated content back to the Dockerfile
+    with open(file_path, 'w') as file:
+        file.write(content)
+
+# Usage
+dockerfile_path = 'path/to/your/Dockerfile'
+username = 'myUsername'
+replace_placeholder_in_dockerfile(dockerfile_path, username)
