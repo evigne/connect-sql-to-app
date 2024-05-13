@@ -26,3 +26,44 @@ def select_and_process():
 
 if __name__ == "__main__":
     select_and_process()
+    
+    
+# editot
+
+import click
+from InquirerPy import prompt
+from InquirerPy.validator import PathValidator
+from rich.console import Console
+
+console = Console()
+
+@click.command()
+@click.option('--edit', is_flag=True, help="Enable editing mode.")
+def configure(edit):
+    if edit:
+        questions = [
+            {
+                "type": "input",
+                "name": "username",
+                "message": "Enter your username:",
+            },
+            {
+                "type": "password",
+                "name": "password",
+                "message": "Enter your password:",
+            },
+            {
+                "type": "filepath",
+                "name": "config_path",
+                "message": "Select a config file:",
+                "validate": PathValidator(is_file=True),
+                "only_files": True,
+            }
+        ]
+        responses = prompt(questions)
+        console.print("Configuration updated with:", responses, style="bold green")
+    else:
+        console.print("Run this command with --edit to modify configurations.", style="bold red")
+
+if __name__ == '__main__':
+    configure()
